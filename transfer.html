@@ -341,12 +341,11 @@
         <div id="emptyMessage" class="empty-msg">No registrations found.</div>
       </div>
     </div>
+  </div> <!-- container closes here exactly like generator (1)_3.html -->
 
-    <!-- Matched Alliance Watermark Footer -->
-    <div style="text-align:center; margin-top:30px; opacity:0.5; font-size:14px;">
-      ☠ 666 • OPAA ALLIANCE • SERVER 1341 ☠
-    </div>
-
+  <!-- Matched Alliance Watermark Footer (Now perfectly centered as a direct child of body) -->
+  <div style="text-align:center; margin-top:30px; opacity:0.5; font-size:14px;">
+    ☠ 666 • OPAA ALLIANCE • SERVER 1341 ☠
   </div>
 
   <script type="module">
@@ -378,7 +377,6 @@
     let isAdding = false;
     const isAdmin = window.location.search.includes("admin=opaa1341");
 
-    // Exact logic structure ported over from generator.html
     async function registerPlayer() {
       if (isAdding) return;
       isAdding = true;
@@ -397,7 +395,6 @@
           return;
         }
 
-        // Exact match check style logic implementation
         const normalized = name.toLowerCase();
         const duplicate = registeredPlayers.find(
           p => (p.name || "").toLowerCase() === normalized
@@ -478,25 +475,21 @@
       });
     }
 
-    // MAP TO WINDOW IMMEDIATELY: Ensures HTML elements access them seamlessly
     window.registerPlayer = registerPlayer;
     window.deletePlayer = deletePlayer;
     window.clearRegistry = clearRegistry;
 
-    // Initialize layout options
     if (isAdmin) {
       document.getElementById("clearAllBtn").style.display = "block";
       document.getElementById("actionHeader").style.display = "table-cell";
     }
 
-    // Real-time listener setup
     onSnapshot(collection(db, "transferSurge"), (snapshot) => {
       registeredPlayers = [];
       snapshot.forEach((docSnap) => {
         registeredPlayers.push({ id: docSnap.id, ...docSnap.data() });
       });
 
-      // Sort by Total Hero Power (THP) highest to lowest
       registeredPlayers.sort((a, b) => b.thp - a.thp);
       renderTable();
     });
