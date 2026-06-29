@@ -91,10 +91,10 @@
 
     .nav-links a:hover { color: #60a5fa; }
 
-    .top-header {
+  .top-header {
       text-align: center;
       margin-bottom: 35px;
-      padding: 30px 24px;
+      padding: 35px 24px;
       width: 100%;
       box-sizing: border-box;
       border-radius: 24px;
@@ -103,11 +103,23 @@
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255,255,255,0.05);
+      transition: all 0.3s ease;
     }
 
     .top-header:hover {
       transform: translateY(-3px);
-      box-shadow: 0 25px 60px rgba(59, 130, 246, 0.15), inset 0 1px 0 rgba(255,255,255,0.1);
+      box-shadow: 0 25px 60px rgba(167, 139, 250, 0.15), inset 0 1px 0 rgba(255,255,255,0.1);
+    }
+
+    .top-header h1 {
+      margin: 0;
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      background: linear-gradient(90deg, #a78bfa, #60a5fa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 30px rgba(167, 139, 250, 0.2);
     }
 
     .subtitle {
@@ -262,7 +274,7 @@
 
   <div class="container">
     <div class="top-header">
-      <h1>Transfer Surge Registry</h1>
+      <h1>1341 Transfer Registry</h1>
       <p class="subtitle">
         <span class="live-dot"></span>
         Incoming Player Migration Registry For 1341
