@@ -356,7 +356,6 @@
       doc
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    // Reusing your project configuration
     const firebaseConfig = {
       apiKey: "AIzaSyD7FLnKz0hq1fBIZT9UakE7h8K-IWCkHws",
       authDomain: "opaa-team-generator.firebaseapp.com",
@@ -366,17 +365,14 @@
       appId: "1:512103695316:web:76df61edd28072780fcc41"
     };
 
+    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
     let registeredPlayers = [];
     const isAdmin = window.location.search.includes("admin=opaa1341");
 
-    if (isAdmin) {
-      document.getElementById("clearAllBtn").style.display = "block";
-      document.getElementById("actionHeader").style.display = "table-cell";
-    }
-
+    // Core registration logic wrapped safely
     async function registerPlayer() {
       const name = document.getElementById("playerName").value.trim();
       const server = document.getElementById("playerServer").value.trim();
@@ -390,10 +386,10 @@
 
       try {
         await addDoc(collection(db, "transferSurge"), {
-          name,
-          server,
-          thp,
-          seat,
+          name: name,
+          server: server,
+          thp: thp,
+          seat: seat,
           timestamp: Date.now()
         });
 
@@ -403,36 +399,31 @@
         alert("Successfully registered!");
       } catch (error) {
         console.error("Error submitting documentation: ", error);
+        alert("Firebase error: " + error.message);
       }
     }
-    window.registerPlayer = registerPlayer;
 
     async function deletePlayer(id) {
       if(confirm("Delete this registry entry?")) {
-        await deleteDoc(doc(db, "transferSurge", id));
+        try {
+          await deleteDoc(doc(db, "transferSurge", id));
+        } catch(err) {
+          console.error(err);
+        }
       }
     }
-    window.deletePlayer = deletePlayer;
 
     async function clearRegistry() {
       if(!confirm("Are you absolutely sure you want to clear the entire list?")) return;
-      const snapshot = await getDocs(collection(db, "transferSurge"));
-      for (const documentSnap of snapshot.docs) {
-        await deleteDoc(doc(db, "transferSurge", documentSnap.id));
+      try {
+        const snapshot = await getDocs(collection(db, "transferSurge"));
+        for (const documentSnap of snapshot.docs) {
+          await deleteDoc(doc(db, "transferSurge", documentSnap.id));
+        }
+      } catch(err) {
+        console.error(err);
       }
     }
-    window.clearRegistry = clearRegistry;
-
-    onSnapshot(collection(db, "transferSurge"), (snapshot) => {
-      registeredPlayers = [];
-      snapshot.forEach((docSnap) => {
-        registeredPlayers.push({ id: docSnap.id, ...docSnap.data() });
-      });
-
-      // Sort seamlessly by Total Hero Power (THP) highest to lowest
-      registeredPlayers.sort((a, b) => b.thp - a.thp);
-      renderTable();
-    });
 
     function renderTable() {
       const tbody = document.getElementById("lineupTableBody");
@@ -459,6 +450,35 @@
           </tr>
         `;
       });
+    }
+
+    // MAP TO WINDOW IMMEDIATELY: Ensures HTML can click them right away
+    window.registerPlayer = registerPlayer;
+    window.deletePlayer = deletePlayer;
+    window.clearRegistry = clearRegistry;
+
+    // Initialize layout options
+    if (isAdmin) {
+      document.getElementById("clearAllBtn").style.display = "block";
+      document.getElementById("actionHeader").style.display = "table-cell";
+    }
+
+    // Real-time listener setup with added failure catch block
+    try {
+      onSnapshot(collection(db, "transferSurge"), (snapshot) => {
+        registeredPlayers = [];
+        snapshot.forEach((docSnap) => {
+          registeredPlayers.push({ id: docSnap.id, ...docSnap.data() });
+        });
+
+        // Sort by Total Hero Power (THP) highest to lowest
+        registeredPlayers.sort((a, b) => b.thp - a.thp);
+        renderTable();
+      }, (error) => {
+        console.error("Firestore real-time error: ", error);
+      });
+    } catch(e) {
+      console.error("Initialization error structural hook: ", e);
     }
   </script>
 </body>
