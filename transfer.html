@@ -260,29 +260,6 @@
 
     .empty-msg { opacity: 0.4; font-style: italic; text-align: center; padding: 25px; color: #94a3b8; font-size: 13px; }
 
-    /* Alliance Watermark Styling */
-    .alliance-footer {
-      margin-top: 50px;
-      margin-bottom: 30px;
-      text-align: center;
-      font-weight: 800;
-      font-size: 13px;
-      letter-spacing: 4px;
-      text-transform: uppercase;
-      background: linear-gradient(90deg, #ef4444, #60a5fa, #ef4444);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-shadow: 0 0 15px rgba(239, 68, 68, 0.15);
-      opacity: 0.6;
-      transition: all 0.3s ease;
-    }
-
-    .alliance-footer:hover {
-      opacity: 1;
-      transform: scale(1.02);
-      text-shadow: 0 0 25px rgba(96, 165, 250, 0.4);
-    }
-
     @media (max-width: 900px) {
       .input-grid { flex-direction: column; }
       input, select, button { width: 100%; }
@@ -365,8 +342,10 @@
       </div>
     </div>
 
-    <!-- Alliance Watermark Footer -->
-    <div class="alliance-footer">☠ 666 • OPAA ALLIANCE • SERVER 1341 ☠</div>
+    <!-- Matched Alliance Watermark Footer -->
+    <div style="text-align:center; margin-top:30px; opacity:0.5; font-size:14px;">
+      ☠ 666 • OPAA ALLIANCE • SERVER 1341 ☠
+    </div>
 
   </div>
 
@@ -396,30 +375,39 @@
     const db = getFirestore(app);
 
     let registeredPlayers = [];
+    let isAdding = false;
     const isAdmin = window.location.search.includes("admin=opaa1341");
 
-    // Core registration logic wrapped safely
+    // Exact logic structure ported over from generator.html
     async function registerPlayer() {
-      const name = document.getElementById("playerName").value.trim();
-      const server = document.getElementById("playerServer").value.trim();
-      const thp = parseFloat(document.getElementById("playerThp").value);
-      const seat = document.getElementById("playerSeat").value;
+      if (isAdding) return;
+      isAdding = true;
 
-      if (!name || !server || isNaN(thp)) {
-        alert("Please complete all form options correctly!");
-        return;
-      }
-
-      // NEW: Check if the player name already exists in the registry
-      const nameExists = registeredPlayers.some(
-        (player) => player.name.toLowerCase() === name.toLowerCase()
-      );
-      if (nameExists) {
-        alert(`Error: A player named "${name}" is already registered!`);
-        return;
-      }
+      const btn = document.querySelector(".submit-btn");
+      if (btn) btn.disabled = true;
 
       try {
+        const name = document.getElementById("playerName").value.trim();
+        const server = document.getElementById("playerServer").value.trim();
+        const thp = parseFloat(document.getElementById("playerThp").value);
+        const seat = document.getElementById("playerSeat").value;
+
+        if (!name || !server || isNaN(thp)) {
+          alert("Please complete all form options correctly!");
+          return;
+        }
+
+        // Exact match check style logic implementation
+        const normalized = name.toLowerCase();
+        const duplicate = registeredPlayers.find(
+          p => (p.name || "").toLowerCase() === normalized
+        );
+
+        if (duplicate) {
+          alert('This player name is already registered!');
+          return;
+        }
+
         await addDoc(collection(db, "transferSurge"), {
           name: name,
           server: server,
@@ -435,11 +423,14 @@
       } catch (error) {
         console.error("Error submitting documentation: ", error);
         alert("Firebase error: " + error.message);
+      } finally {
+        isAdding = false;
+        if (btn) btn.disabled = false;
       }
     }
 
     async function deletePlayer(id) {
-      if(confirm("Delete this registry entry?")) {
+      if(confirm("Remove this entry?")) {
         try {
           await deleteDoc(doc(db, "transferSurge", id));
         } catch(err) {
@@ -487,7 +478,7 @@
       });
     }
 
-    // MAP TO WINDOW IMMEDIATELY: Ensures HTML can click them right away
+    // MAP TO WINDOW IMMEDIATELY: Ensures HTML elements access them seamlessly
     window.registerPlayer = registerPlayer;
     window.deletePlayer = deletePlayer;
     window.clearRegistry = clearRegistry;
@@ -498,23 +489,17 @@
       document.getElementById("actionHeader").style.display = "table-cell";
     }
 
-    // Real-time listener setup with added failure catch block
-    try {
-      onSnapshot(collection(db, "transferSurge"), (snapshot) => {
-        registeredPlayers = [];
-        snapshot.forEach((docSnap) => {
-          registeredPlayers.push({ id: docSnap.id, ...docSnap.data() });
-        });
-
-        // Sort by Total Hero Power (THP) highest to lowest
-        registeredPlayers.sort((a, b) => b.thp - a.thp);
-        renderTable();
-      }, (error) => {
-        console.error("Firestore real-time error: ", error);
+    // Real-time listener setup
+    onSnapshot(collection(db, "transferSurge"), (snapshot) => {
+      registeredPlayers = [];
+      snapshot.forEach((docSnap) => {
+        registeredPlayers.push({ id: docSnap.id, ...docSnap.data() });
       });
-    } catch(e) {
-      console.error("Initialization error structural hook: ", e);
-    }
+
+      // Sort by Total Hero Power (THP) highest to lowest
+      registeredPlayers.sort((a, b) => b.thp - a.thp);
+      renderTable();
+    });
   </script>
 </body>
 </html>
