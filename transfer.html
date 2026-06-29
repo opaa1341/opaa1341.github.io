@@ -20,6 +20,9 @@
       min-height: 100vh;
       animation: fadePage 0.5s ease;
       overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
     body::before, body::after {
@@ -170,7 +173,6 @@
     .submit-btn { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; }
     .clear-btn { background: linear-gradient(135deg, #ef4444, #b91c1c); color: white; margin-bottom: 20px; }
 
-    /* Seat Badges Style */
     .badge {
       padding: 4px 12px;
       border-radius: 20px;
@@ -208,7 +210,6 @@
     <div class="nav-links">
         <a href="index.html">Home</a>
         <a href="generator.html">Team Maker</a>
-        <a href="transfer.html">Transfer Registry</a>
         <a href="buff.html">Buffs</a>
     </div>
   </nav>
@@ -216,7 +217,10 @@
   <div class="container">
     <div class="top-header">
       <h1>Transfer Surge Registry</h1>
-      <p class="subtitle">Pre-registration Lineup Management System</p>
+      <p class="subtitle">
+        <span class="live-dot"></span>
+        Pre-registration Lineup Management System
+      </p>
     </div>
 
     <!-- Registration Form Panel -->
