@@ -410,6 +410,15 @@
         return;
       }
 
+      // NEW: Check if the player name already exists in the registry
+      const nameExists = registeredPlayers.some(
+        (player) => player.name.toLowerCase() === name.toLowerCase()
+      );
+      if (nameExists) {
+        alert(`Error: A player named "${name}" is already registered!`);
+        return;
+      }
+
       try {
         await addDoc(collection(db, "transferSurge"), {
           name: name,
